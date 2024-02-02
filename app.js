@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const { log } = require('console');
+
+const userRoutes = require('./routes/userRoutes')
 
 const app = express();
 
@@ -24,6 +25,8 @@ db.on('error', (error) => console.error('Erreur de connexion à MongoDB :', erro
 db.once('open', () => console.log('Connecté à MongoDB'));
 
 app.use(bodyParser.json());
+
+app.use(userRoutes);
 
 app.get('*', (req, res) => {
     res.status(404).json({ error: "page non trouvée" })

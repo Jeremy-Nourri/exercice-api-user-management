@@ -12,19 +12,19 @@ const userController = {
             userData.password = hashedPassword;
 
             const { username, email } = await Users.create(userData);
-            res.status(201).json({ username, email});
+            res.status(201).json({ username, email });
         }
         catch (error) {
             res.status(400).json({ error: "Erreur lors de la création d'un nouvel utilisateur" });
         }
     },
-    
+
     loginUser: async (req, res) => {
         try {
             const userEmail = req.body.email;
             const passwordFromRequest = req.body.password;
 
-            const { username, email, password }  = await Users.findOne({ email: userEmail });
+            const { username, email, password } = await Users.findOne({ email: userEmail });
 
             const validPassword = await bcrypt.compare(passwordFromRequest, password);
 
@@ -35,7 +35,19 @@ const userController = {
         } catch (error) {
             res.status(500).send(error);
         }
-    }
+    },
+
+    getAllUsers: async (req, res) => {
+        try {
+            const users = await Users.find().select('-password');
+            if (!users) {
+                return res.status(404).json({ message: "Aucun utilisateur" });
+            }
+            res.json(users);
+        } catch (error) {
+            res.status(500).json({ error: "Erreur lors de la requête" })
+        }
+    },
 }
 
 module.exports = userController;

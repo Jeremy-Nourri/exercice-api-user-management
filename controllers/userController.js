@@ -1,10 +1,11 @@
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken');
 
 const Users = require('../models/userModel');
 
 const userController = {
 
-    createUser: async (req, res) => {
+    signUp: async (req, res) => {
         try {
             const userData = req.body;
             const salt = await bcrypt.genSalt(10);
@@ -24,18 +25,39 @@ const userController = {
             const userEmail = req.body.email;
             const passwordFromRequest = req.body.password;
 
-            const { username, email, password } = await Users.findOne({ email: userEmail });
+            const { username, password, id } = await Users.findOne({ email: userEmail });
 
             const validPassword = await bcrypt.compare(passwordFromRequest, password);
 
             if (!username || !validPassword) {
-                return res.status(400).json({ message: "Email ou/et mot de passe invalide(s)" });
+                return res.status(401).json({ message: "Email ou/et mot de passe invalide(s)" });
             }
-            res.send({ username, email });
+
+            const token = jwt.sign({ id }, process.env.RANDOM_TOKEN_SECRET, { expiresIn: "1d" });
+        
+            res.header('Authorization', `Bearer ${token}`).json({ message: 'Login successful', token });
+
         } catch (error) {
-            res.status(500).send(error);
+            res.status(500).json({ error, message: "erreur lors de la requête" });
         }
     },
+
+    // getUser: async (req, res) => {
+    //     try {
+
+    //         const userId = req.user.id;
+
+    //         const user = Users.findOne({ userId }).select('-password');
+
+    //         if (!user) {
+    //             return res.status(404).json({ message: "Aucun utilisateur" });
+    //         }
+    //         res.json(user);
+    //     } catch (error) {
+    //         res.status(500).json({ error: "Erreur lors de la requête" })
+    //     }
+    // },
+
 
     getAllUsers: async (req, res) => {
         try {

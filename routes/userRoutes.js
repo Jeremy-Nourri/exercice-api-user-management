@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-
+const checkTokenValidity = require('../middlewares/authentication')
 const userController = require('../controllers/userController')
 
 router.get("/", (req, res) => {
@@ -8,10 +8,10 @@ router.get("/", (req, res) => {
 })
 
 router.get('/users', userController.getAllUsers);
+router.get('/profile', checkTokenValidity, userController.getUser);
 
-router.post('/create-user', userController.createUser);
+router.post('/signup', userController.signUp);
 router.post('/login', userController.loginUser);
-
 
 
 module.exports = router;

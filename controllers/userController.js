@@ -42,21 +42,17 @@ const userController = {
         }
     },
 
-    // getUser: async (req, res) => {
-    //     try {
-
-    //         const userId = req.user.id;
-
-    //         const user = Users.findOne({ userId }).select('-password');
-
-    //         if (!user) {
-    //             return res.status(404).json({ message: "Aucun utilisateur" });
-    //         }
-    //         res.json(user);
-    //     } catch (error) {
-    //         res.status(500).json({ error: "Erreur lors de la requête" })
-    //     }
-    // },
+    getUser: async (req, res) => {
+        try {
+            const user = await Users.findById(req.id);
+            if (!user) {
+                return res.status(404).send('Utilisateur non trouvé');
+            }
+            res.send(user);
+        } catch (error) {
+            res.status(500).json({ error: "Erreur lors de la requête" })
+        }
+    },
 
 
     getAllUsers: async (req, res) => {
